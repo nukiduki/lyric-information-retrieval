@@ -17,13 +17,13 @@ class BasicModel():
         return query
 
     def check_query(self, query: Query):
-        print(f"Checking query: {query} (Type: {type(query)})")
+        # print(f"Checking query: {query} (Type: {type(query)})")
         
         for one_character in query:
             # print(f"Character: {one_character}")  # Debugging print
             if not (one_character.isalpha() or
                     one_character.isdigit() or
-                    one_character in [' ', '(', ')']):
+                    one_character.isspace()):  # only letters, numbers and spaces allowed (no paranthesis currently)
                 print("Invalid character found: " + one_character)
                 return False
         return True

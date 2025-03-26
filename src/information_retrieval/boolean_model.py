@@ -14,12 +14,15 @@ from src.information_retrieval.basic_model import BasicModel
 
 
 class BooleanModel(BasicModel):
+    """Class for the boolean model of the information retrieval system"""
+
     def __init__(self):
         super().__init__()
         self.matrix: Dict[str, Tuple[int, List[int]]] = self.create_matrix()
         self.export_path = "output/boolean_model"
 
     def create_matrix(self):
+        """Create the inverted index matrix"""
         matrix = self.get_matrix_if_stored()
         if matrix != {}:
             return matrix
@@ -34,10 +37,11 @@ class BooleanModel(BasicModel):
         return final_matrix  # just in case the result is needed somewhere else
 
     def create_unoptimized_matrix(self):
+        """Create the unoptimized matrix"""
         matrix_unorganized: List[Tuple[str, int]] = [] 
         filenames: List[str] = []
 
-        print("Creating dictionary... Finding lyric files...")
+        print("Creating dictionary... Finding lyric files...\nResults:\n")
 
         directory = "data/lyrics/"
         for lyric_file in os.listdir(directory):
@@ -60,6 +64,7 @@ class BooleanModel(BasicModel):
         return matrix_unorganized
 
     def order_matrix(self, matrix: List[Tuple[str, int]]):
+        """Create the inverted index matrix from the unoptimized matrix"""
         optimized_inverted_matrix: Dict[str, Tuple[int, List[int]]] = {}
 
         matrix.sort(key=lambda x: x[0])  # Sort by the first element (word)
@@ -81,6 +86,7 @@ class BooleanModel(BasicModel):
         return optimized_inverted_matrix
 
     def store_matrix(self, matrix):
+        """Store the inverted index matrix in a CSV file"""
         with open("data/ir/boolean_model.csv", mode='w', newline='', encoding='utf-8') as bool_file:
             csv_writer = csv.writer(bool_file)
 
@@ -90,9 +96,10 @@ class BooleanModel(BasicModel):
                 doc_ids_str = ', '.join(map(str, doc_ids))  # string of fileindexes
                 csv_writer.writerow([word, freq, doc_ids_str])
 
-        print("Matrix exported to data/ir/boolean_model.csv")
+        # print("Matrix exported to data/ir/boolean_model.csv")
 
     def get_matrix_if_stored(self):
+        """Import the inverted index matrix from a CSV file"""
         imported_matrix: Dict[str, Tuple[int, List[int]]] = {}
 
         try:
@@ -111,9 +118,8 @@ class BooleanModel(BasicModel):
                     fileindex_list = list(map(int, fileindexes.split(', ')))
                     imported_matrix[word] = [frequency, fileindex_list]
                     
-                # update nr_of_docs (max fileindex)
                 self.nr_of_docs = max(max(imported_matrix.values())[1])
-                print(f"Matrix imported from data/ir/boolean_model.csv with {self.nr_of_docs} documents")
+                # print(f"Matrix imported from data/ir/boolean_model.csv with {self.nr_of_docs} documents")
 
         except FileNotFoundError:
             print("Matrix not existing... Creating new matrix")
@@ -121,9 +127,11 @@ class BooleanModel(BasicModel):
         return imported_matrix
 
     def get_files(self, word: str) -> Set[int]:
-        return set(self.matrix.get(word, (0, []))[1])  # just a helper to extract the file index list
+        """A helper to extract the file index list of a word"""	
+        return set(self.matrix.get(word, (0, []))[1])
 
     def evaluate_expression(self, tokens: List[str], start: int = 0) -> Tuple[Set[int], int]:
+        """Recursively evaluate the expression"""
         result = set()
         operation = None  # last logical operation
         counter = start
@@ -132,11 +140,11 @@ class BooleanModel(BasicModel):
         while counter < len(tokens):
             token = tokens[counter]
 
-            if token == "(":
-                sub_result, counter = self.evaluate_expression(tokens, counter + 1)
-            elif token == ")":
-                return result, counter  # End recursion at closing parenthesis
-            elif token.upper() == "NOT":
+            # if token == "(":  # leave out parenthesis for now
+            #     sub_result, counter = self.evaluate_expression(tokens, counter + 1)
+            # elif token == ")":
+            #     return result, counter  # End recursion at closing parenthesis
+            if token.upper() == "NOT":
                 # Apply NOT to the next term
                 next_set, counter = self.evaluate_expression(tokens, counter + 1)
                 result = result - next_set if operation else next_set
@@ -160,17 +168,16 @@ class BooleanModel(BasicModel):
         return result, counter
 
     def process_query(self, query: Query) -> Set[int]:
+        """Process the user query"""
         if not query.tokens:
-            print("Tokenization failed")
+            print("Tokenization failed\n")
             return set()
 
-        print("Starting recursive search...")
+        # print("Starting recursive search...")
         result_set, _ = self.evaluate_expression(query.tokens)
 
-        # print(result_set)
-
         if not result_set:
-            print("No results found")
+            print("No results found\n")
 
         else:
             self.export_results(query, result_set)
@@ -178,6 +185,7 @@ class BooleanModel(BasicModel):
         return result_set
     
     def export_results(self, query: Query, result_set: Set[int]):
+        """Export the results to output directory"""
         filenames: List[str] = []
         counter = 0
 
@@ -205,3 +213,5 @@ class BooleanModel(BasicModel):
 
             except Exception as e:
                 print(f"Error copying {source_path}: {e}")
+
+        print("\n")
