@@ -62,6 +62,9 @@ class VectorSpaceModel(BooleanModel):
         self.matrix = {}  # in this case weights of words in documents
         self.export_path = "output/vector_space_model"
         super().__init__()  # super called last to fill matrix and idf after initialization
+        
+    def print_query_info(self):
+        print("Please enter query (Example: \"i love my life\"): ")
 
     def create_matrix(self):
         """Load matrices if possible else create the matrix of weights and idf"""

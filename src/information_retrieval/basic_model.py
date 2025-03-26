@@ -7,9 +7,12 @@ class BasicModel():
     
     def __init__(self):
         self.nr_of_docs: int = 0
+        
+    def print_query_info(self):
+        print("Please enter query (Example: \"love AND fire\"): ")
 
     def get_user_query(self):
-        print("Please enter query (Example: love AND fire): ")
+        self.print_query_info()
         query: Query = Query(input())
         if not self.check_query(query):
             print("Please enter query. No special characters allowed: ")
