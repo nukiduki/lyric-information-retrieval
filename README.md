@@ -17,6 +17,8 @@ The project is containing the following parts:
 1. An information retrieval system based on the Boolean Model	
 1. An information retrieval system based on the Vector Space Model
 
+The implementation is my work with debugging supported by ChatGPT.
+
 ### Information Retrieval
 There are two systems: The Boolean Model and the Vector Space Model
 
