@@ -15,7 +15,8 @@ from src.information_retrieval.basic_model import BasicModel
 
 class BooleanModel(BasicModel):
     def __init__(self):
-        self.bool_inverse_matrix: Dict[str, Tuple[int, List[int]]] = self.create_matrix()
+        super().__init__()
+        self.matrix: Dict[str, Tuple[int, List[int]]] = self.create_matrix()
         self.export_path = "output/boolean_model"
 
     def create_matrix(self):
@@ -28,8 +29,9 @@ class BooleanModel(BasicModel):
         final_matrix = self.order_matrix(matrix_unorganized)
 
         self.store_matrix(final_matrix)
+        self.matrix = final_matrix
 
-        return final_matrix
+        return final_matrix  # just in case the result is needed somewhere else
 
     def create_unoptimized_matrix(self):
         matrix_unorganized: List[Tuple[str, int]] = [] 
@@ -42,6 +44,7 @@ class BooleanModel(BasicModel):
             filename = lyric_file
             if filename.endswith(".txt"):
                 filenames.append(os.path.join(directory, filename))
+                self.nr_of_docs += 1
 
         for fileindex in range(0, len(filenames)):  # one number for each entry
             # print(fileindex)
@@ -107,6 +110,10 @@ class BooleanModel(BasicModel):
                     fileindexes = row[2]  # Third column: document IDs as a string!
                     fileindex_list = list(map(int, fileindexes.split(', ')))
                     imported_matrix[word] = [frequency, fileindex_list]
+                    
+                # update nr_of_docs (max fileindex)
+                self.nr_of_docs = max(max(imported_matrix.values())[1])
+                print(f"Matrix imported from data/ir/boolean_model.csv with {self.nr_of_docs} documents")
 
         except FileNotFoundError:
             print("Matrix not existing... Creating new matrix")
@@ -114,7 +121,7 @@ class BooleanModel(BasicModel):
         return imported_matrix
 
     def get_files(self, word: str) -> Set[int]:
-        return set(self.bool_inverse_matrix.get(word, (0, []))[1])  # just a helper to extract the file index list
+        return set(self.matrix.get(word, (0, []))[1])  # just a helper to extract the file index list
 
     def evaluate_expression(self, tokens: List[str], start: int = 0) -> Tuple[Set[int], int]:
         result = set()

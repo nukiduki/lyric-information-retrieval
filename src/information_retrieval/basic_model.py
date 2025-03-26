@@ -6,7 +6,7 @@ from src.information_retrieval.query import Query
 class BasicModel():
     
     def __init__(self):
-        pass
+        self.nr_of_docs: int = 0
 
     def get_user_query(self):
         print("Please enter query (Example: love AND fire): ")
