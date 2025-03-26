@@ -60,8 +60,8 @@ class VectorSpaceModel(BooleanModel):
     def __init__(self):
         self.idf = {}  # Inverse document frequency calculated during matrix creation
         self.matrix = {}  # in this case weights of words in documents
-        self.export_path = "output/vector_space_model"
         super().__init__()  # super called last to fill matrix and idf after initialization
+        self.export_path = "output/vector_space_model"
         
     def print_query_info(self):
         print("Please enter query (Example: \"i love my life\"): ")
@@ -149,6 +149,7 @@ class VectorSpaceModel(BooleanModel):
         dest_directory = os.path.join(self.export_path, query.export())
         os.makedirs(dest_directory, exist_ok=True)
 
+        # get filenames of the top results
         for filename in os.listdir(source_directory):
             if filename.endswith(".txt") and (counter in [doc_id for doc_id, _ in result_set]):
                 score = [score for doc_id, score in result_set if doc_id == counter][0]
@@ -156,7 +157,6 @@ class VectorSpaceModel(BooleanModel):
                 filenames.append((rank, (filename, score)))
             counter += 1
 
-        # sort by rank
         filenames.sort(key=lambda x: x[0])
 
         with open(os.path.join(dest_directory, "results_overview.csv"), "w", newline="") as csvfile:
