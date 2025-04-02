@@ -1,0 +1,40 @@
+Boolean Model Evaluation
+
+The following evaluates the information retrieval system based on the Boolean model.
+First, three different types of queries were selected, with four examples for each type. The first type are single word queries, the second logical queries with 2-3 words, connected by AND or OR and the third type is short human language sentences. The queries were chosen by a mix of common and uncommon music themes. There are only 12 queries because the evaluation is done manually and it is a time consuming process.
+
+The selected queries are:
+1.	love
+2.	fire
+3.	summer
+4.	toxic
+
+5.	song OR lyric
+6.	beautiful OR cute
+7.	mama AND kids OR family
+8.	mountain OR river OR nature
+
+9.	sound of the end of the world
+10.	stop my heartbreak
+11.	i love you and i miss you
+12.	remind me of memories
+
+Before the execution of the queries, the given songs were evaluated manually (448 songs of the user’s music selection). This means, for each query every song that was expected to fit the topic of the query was selected and marked with an 1.  After the manual evaluation the Boolean model was used to evaluate each query. The detailed results can be found in the bool_eval.csv file. With both datasets, expected songs and retrieved songs, the recall and precision were calculated. Afterwards the f measure was calculated harmonically and with different β values, with a focus on the f-measure with β=0. 
+
+When retrieving song lyrics recall and precision are both important. But, depending on the user’s situation they might not want to retrieve songs that do not fit their needs. For example, if they are currently in love and want to listen to happy love songs, they might be disappointed when a heartbreak themed song is selected just because it contains the term “love”. Therefore, precision is more important than recall. But it might change based on the user’s situation, for example if a user is searching for a very specific lyric to find a song that is stuck in their head, recall had to be prioritized.
+
+For each query, after running the model, the retrieved files were checked to ensure they contain the expected words, validating that the model functions correctly. For queries 1-8 the retrieved documents have exactly the lyrics that contain the wanted words and/or fulfill the logical query. This is the expected behavior of a Boolean system, confirming that it functions correctly. For the queries 9-12 the results depend on the implementation. In this case only the last word gets considered for the final result. This means these queries get the same results as if only their last word was used as a single word query. This is not bad in particular, as it depends on the implementation, but it hints on the user being not satisfied with results 9-12 because the human language queries are being simplified in a suboptimal way.
+
+In the given evaluation, the Boolean system scores approximately on average a 0.4 for both precision and recall. When comparing the result to good values above 0.8, the result is weak. This is a further indicator, that the Boolean model might not be working well for the given context, Also, there are fluctuations being found between measurements of different queries. Sometimes precision is perfect but only because the recall is very small, like with the query “toxic”. And sometimes it is the other way around, like with the query “fire”. This can be explained by the different kinds of queries. As an explanation: “toxic” is a description of a topic that many songs are about (toxic friendships, toxic relationships, toxic society), so many songs were expected, but the term is not contained in many songs. The opposite is true for “fire”, not that many songs deal with the topic of fire, but it is often used in lyrics as a metaphor for anger or fear. So, precision and recall vary, but on average do not fulfill the user’s needs.
+
+Looking closely at the f measure, the previously indicated bad results get verified. Using the F-measure with β=0, because as previously explained, precision is here considered more important for the user than recall, the system gets an average rating of 0,4. When excluding queries 9-12 it increases to a 0.42 which is still very little compared to a rather good score above 0.8.
+
+These scores are relatively low and show that a Boolean model based on term matching is not that useful at handling users’ feelings in queries. This makes sense, because lyrics are very artistic with many interpretations and individual values. For example, a user searching for the term “ball” might be searching for soccer music or maybe for music fitting the formal gathering ball. Next to that, even in those particular topics users have different focusses they want to set in their music and they can interpret music in their own unique way.
+When comparing the results of the different types of queries there are no relevant differences being found between queries 1-4 and queries 5-8. Here, the different f-measures all score on average between 0.4 and 0.5. This can be traced back to the fact they all rely on term matching and are affected by the same problems as explained. But, no surprise, the Boolean model scores worse at human language queries 9-12. This is because, as previously explained, the Boolean model simplifies the meaning by using a queries’ last word. Here the f-measure varies by β value between 0.2 and 0.4.
+
+Understanding those kinds of queries is not only difficult, but near impossible for a term matching model. Similar to previous examples, a user searching for the query “stop my heartbreak” might be looking for happy songs to feel better or maybe for sad songs to cope with their grief. The system, also only knowing lyrics and no information about melody and tone, does its best to find heartbreak songs but even a human might have difficulties determining the right songs for another person or even themselves.
+
+One last issue that decreases especially the recall measurements is the variation of the unordered data, as it contains a few German and Korean songs, that cannot be found by the model that is not able to translate the english queries. Like this language barrier, highly poetic metaphorical texts can be seen as a form of other language too, because they deal with other things than what the lyrics contain.
+In conclusion, even though the system is working perfectly as specified, the evaluation shows that a term matching Boolean model is not suitable for information retrieval of song lyrics, because the user searches for a deeper meaning of songs or adds their own interpretation. 
+
+For a Boolean model to provide better results, users must use very precise queries, decreasing ambiguity.  However, this approach still cannot get deeper meaning and emotional nuances that users seek in music. Instead, the user could consider using a Vector Space Model to get better results and a higher user happiness. The used term frequency and document frequency measures in a Vector Space Model might give the user a more precise selection of lyrics especially in multiple word queries, because it sets prioritization on different words, while still not being able to recognize users individual feelings and interpretations.
