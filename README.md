@@ -40,6 +40,13 @@ There are two systems: The Boolean Model and the Vector Space Model
 - Formular used for Query: (1 + log(tf)) * log2(N / df) -> Here might be possible improvements
 - Result are: the files of all songs that are most similar to the query, a csv called "results_overview.csv" with the queries results in order
 
+#### Latent Semantic Indexing Model
+- Extends the Vector Space Model by applying Singular Value Decomposition (SVD) to reduce dimensionality.
+- SVD is performed on the term-document matrix (built from the inverted index), breaking it into three matrices: U (left singular vectors), S (singular values), and V (right singular vectors).
+- Only the top k singular values and their vectors are retained to capture the most relevant semantic structure.
+- These reduced matrices form a lower-dimensional term-document matrix.
+- Cosine similarity is then computed between the query and documents (e.g., songs) using this reduced matrix to return the most semantically relevant results.
+
 ### Collection of Unstructured Data 
 
 - csv of song names and their artists exported via [Exportify](https://exportify.net/#playlists)
