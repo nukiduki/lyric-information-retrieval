@@ -57,11 +57,12 @@ from src.information_retrieval.boolean_model import BooleanModel
 class VectorSpaceModel(BooleanModel):
     """Model based on the boolean model to avoid code duplication"""
 
-    def __init__(self):
+    def __init__(self, k_numbers: int = 10):
         self.idf = {}  # Inverse document frequency calculated during matrix creation
         self.matrix = {}  # in this case weights of words in documents
         super().__init__()  # super called last to fill matrix and idf after initialization
-        self.export_path = "output/vector_space_model"
+        self.export_path = "output\\vector_space_model"
+        self.k_numbers = k_numbers  # number of documents to return
         
     def print_query_info(self):
         print("Please enter query (Example: \"i love my life\"): ")
@@ -285,9 +286,10 @@ class VectorSpaceModel(BooleanModel):
             query_tf[term] *= self.idf.get(term, 0)  # Multiplying with IDF (remember its log2(Nr of docs/dfi))
         return query_tf
 
-    def cosine_score(self, query: List[str], k: int = 10) -> List[Tuple[int, float]]:
+    def cosine_score(self, query: List[str]) -> List[Tuple[int, float]]:
         """Compute cosine similarity scores for a query and returns the top K documents."""
         scores = {}  # {doc_id: similarity_score}
+        k = self.k_numbers
 
         query_weights = self.calculate_query_weights(query)
 
@@ -302,6 +304,11 @@ class VectorSpaceModel(BooleanModel):
         doc_lengths: Dict[int, float] = self.compute_doc_lengths()
         for doc_id in scores:
             scores[doc_id] /= doc_lengths.get(doc_id, 1)  # Avoid division by zero
+            
+        if k == 66:
+            print("K is 66!!!!")
+            print(scores.items())
+            print("That was all")
 
         # Get the top K documents
         return heapq.nlargest(k, scores.items(), key=lambda x: x[1])
@@ -322,3 +329,7 @@ class VectorSpaceModel(BooleanModel):
             self.export_results(query, result_set)
 
         return result_set
+    
+    def set_k_numbers(self, k: int):
+        """Set the number of documents to return"""
+        self.k_numbers = k
